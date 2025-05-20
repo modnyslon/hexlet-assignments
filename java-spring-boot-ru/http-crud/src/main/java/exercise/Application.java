@@ -3,6 +3,7 @@ package exercise;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -33,24 +34,10 @@ public class Application {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer limit
     ) {
-        // Вычисляем начальный индекс для текущей страницы
-        int startIndex = (page - 1) * limit;
-
-        // Проверяем, чтобы startIndex не был отрицательным
-        if (startIndex < 0) {
-            startIndex = 0;
-        }
-
-        // Проверяем, чтобы startIndex не превышал размер списка
-        if (startIndex >= posts.size()) {
-            return Collections.emptyList();
-        }
-
-        // Вычисляем конечный индекс
-        int endIndex = Math.min(startIndex + limit, posts.size());
-
-        // Возвращаем подсписок для текущей страницы
-        return posts.subList(startIndex, endIndex);
+        return posts.stream()
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/posts") // Создание страницы
